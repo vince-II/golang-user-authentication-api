@@ -1,4 +1,3 @@
-
 // Sample run-helloworld is a minimal Cloud Run service.
 package main
 
@@ -9,9 +8,30 @@ import (
 	"os"
 )
 
+func registerUser(w http.ResponseWriter, req *http.Request) {
+	// Parse the request body
+	if err := req.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form", http.StatusBadRequest)
+		return
+	}
+	// Extract the user data from the form
+	username := req.FormValue("username")
+	password := req.FormValue("password")
+	email := req.FormValue("email")
+
+	if username == "" || password == "" || email == "" {
+		http.Error(w, "Missing required fields", http.StatusBadRequest)
+		return
+	}
+	fmt.Fprintf(w, "User registered successfully!\n")
+}
+
 func main() {
 	log.Print("starting server...")
+
+	// endpoints
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/register", registerUser)
 
 	// Determine port for HTTP service.
 	port := os.Getenv("PORT")
